@@ -9,7 +9,7 @@ WORKDIR /tmp
 
 RUN dnf update -y && dnf install \
         libmnl-devel elfutils-libelf-devel findutils binutils boost-atomic boost-chrono \
-        boost-date-time boost-system boost-thread cpp dyninst efivar-libs gc \
+        boost-date-time boost-system boost-thread cpp dyninst efivar-libs gc kmod \
         gcc glibc-devel glibc-headers guile koji isl libatomic_ops libdwarf libmpc \
         libpkgconf libtool-ltdl libxcrypt-devel make mokutil pkgconf pkgconf-m4 \
         pkgconf-pkg-config unzip zip /usr/bin/pkg-config xz -y && \
@@ -43,6 +43,8 @@ RUN dnf update -y && dnf install kmod koji libmnl -y && \
 
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko
+
+COPY --from=builder /sbin/modprobe /sbin/modprobe
 
 COPY --from=builder /usr/bin/wg /usr/bin/wg
 COPY --from=builder /usr/bin/wg-quick /usr/bin/wg-quick
