@@ -1,5 +1,5 @@
+# builder
 FROM fedora as builder
-MAINTAINER "Joe Doss" <joe@solidadmin.com>
 
 ARG WIREGUARD_VERSION
 ARG WIREGUARD_KERNEL_VERSION
