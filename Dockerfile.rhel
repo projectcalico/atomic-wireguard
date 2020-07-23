@@ -46,7 +46,7 @@ ARG WIREGUARD_KERNEL_VERSION
 
 COPY --from=builder /sbin/modprobe /sbin/modprobe
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
-                    /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko
+                    /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/wireguard.ko
 
 COPY --from=builder /usr/bin/wg /usr/bin/wg
 COPY --from=builder /usr/bin/wg-quick /usr/bin/wg-quick
