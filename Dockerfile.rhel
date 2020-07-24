@@ -50,6 +50,7 @@ COPY modules.dep /lib/modules/${WIREGUARD_KERNEL_VERSION}/modules.dep
 
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko
+RUN depmod -a
 
 COPY --from=builder /usr/bin/wg /usr/bin/wg
 COPY --from=builder /usr/bin/wg-quick /usr/bin/wg-quick
