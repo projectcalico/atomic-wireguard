@@ -46,8 +46,6 @@ ARG WIREGUARD_KERNEL_VERSION
 RUN yum update -y
 RUN yum install kmod -y
 
-COPY modules.dep /lib/modules/${WIREGUARD_KERNEL_VERSION}/modules.dep
-
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko
 RUN depmod -a
