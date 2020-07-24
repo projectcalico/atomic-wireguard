@@ -12,7 +12,7 @@ WORKDIR /tmp
 
 RUN dnf update -y && dnf install \
         libmnl-devel elfutils-libelf-devel findutils binutils boost-atomic boost-chrono \
-        boost-date-time boost-system boost-thread cpp dyninst efivar-libs gc kmod \
+        boost-date-time boost-system boost-thread cpp dyninst efivar-libs gc \
         gcc glibc-devel glibc-headers guile koji isl libatomic_ops libdwarf libmpc \
         libpkgconf libtool-ltdl libxcrypt-devel make mokutil pkgconf pkgconf-m4 \
         pkgconf-pkg-config unzip zip /usr/bin/pkg-config xz -y && \
@@ -44,7 +44,8 @@ WORKDIR /tmp
 
 ARG WIREGUARD_KERNEL_VERSION
 
-COPY --from=builder /sbin/modprobe /sbin/modprobe
+RUN yum install kmod -y
+
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/wireguard.ko
 
