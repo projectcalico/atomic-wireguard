@@ -41,6 +41,8 @@ RUN dnf update -y && dnf install kmod koji libmnl -y && \
         kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm -y && \
         dnf clean all && rm -f /tmp/*.rpm
 
+RUN echo "extra/wireguard.ko" >> /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/module.dep
+
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko
 
