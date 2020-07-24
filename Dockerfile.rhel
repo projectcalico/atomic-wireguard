@@ -46,6 +46,10 @@ ARG WIREGUARD_KERNEL_VERSION
 RUN yum update -y
 RUN yum install kmod -y
 
+COPY --from=builder /usr/lib/modules/4.18.0-193.el8.x86_64/kernel/net/ipv4/udp_tunnel.ko.xz \
+                    /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv4/udp_tunnel.ko.xz
+COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz \
+                    /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/wireguard.ko
 RUN depmod -a
