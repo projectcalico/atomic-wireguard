@@ -31,11 +31,10 @@ RUN if [ -n "${KERNEL_CORE_RPM}" ]; then \
     fi; \
         dnf install kernel-core-${WIREGUARD_KERNEL_VERSION}.rpm \
         kernel-devel-${WIREGUARD_KERNEL_VERSION}.rpm \
-        kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm -y && \
-        dnf clean all
+        kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm -y
 
-RUN cd /tmp/WireGuard-${WIREGUARD_VERSION}/src; \
-    KERNELDIR=/usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/build make -j$(nproc) && make install
+RUN cd /tmp/wireguard-linux-compat-${WIREGUARD_VERSION}/src; \
+    KERNELDIR=/usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/build make -j$(nproc) &&  KERNELRELEASE=${WIREGUARD_KERNEL_VERSION} make install
 
 # base
 FROM registry.access.redhat.com/ubi8:latest
@@ -47,7 +46,7 @@ ARG WIREGUARD_KERNEL_VERSION
 RUN yum update -y
 RUN yum install kmod -y
 
-COPY --from=builder /usr/lib/modules/4.18.0-193.el8.x86_64/kernel/net/ipv4/udp_tunnel.ko.xz \
+COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv4/udp_tunnel.ko.xz \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv4/udp_tunnel.ko.xz
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz
