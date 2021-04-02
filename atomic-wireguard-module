@@ -43,7 +43,7 @@ build_wireguard()
     podman build --build-arg WIREGUARD_VERSION=${WIREGUARD_VERSION} \
     --build-arg WIREGUARD_SHA256=${WIREGUARD_SHA256} \
     --build-arg WIREGUARD_KERNEL_VERSION=${WIREGUARD_KERNEL_VERSION} \
-    -t wireguard:${WIREGUARD_VERSION} git://github.com/jdoss/atomic-wireguard
+    -t wireguard:${WIREGUARD_VERSION} git://github.com/projectcalico/atomic-wireguard
   fi
 
   if [ "${WIREGUARD_VERSION}" != "$(podman run --name wireguard -e "WIREGUARD_VERSION=${WIREGUARD_VERSION}" \
@@ -57,7 +57,7 @@ build_wireguard()
     podman build --build-arg WIREGUARD_VERSION=${WIREGUARD_VERSION} \
     --build-arg WIREGUARD_SHA256=${WIREGUARD_SHA256} \
     --build-arg WIREGUARD_KERNEL_VERSION=${WIREGUARD_KERNEL_VERSION} \
-    -t wireguard:${WIREGUARD_VERSION} git://github.com/jdoss/atomic-wireguard
+    -t wireguard:${WIREGUARD_VERSION} git://github.com/projectcalico/atomic-wireguard
   fi
 
   echo "Cleaning up old WireGuard kernel module container builds..."

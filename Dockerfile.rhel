@@ -15,8 +15,9 @@ RUN dnf update -y && dnf install \
         boost-date-time boost-system boost-thread cpp dyninst efivar-libs gc \
         gcc glibc-devel glibc-headers guile koji isl libatomic_ops libdwarf libmpc \
         libpkgconf libtool-ltdl libxcrypt-devel make mokutil pkgconf pkgconf-m4 \
-        pkgconf-pkg-config unzip zip /usr/bin/pkg-config xz -y && \
-        curl -LS https://git.zx2c4.com/WireGuard/snapshot/WireGuard-${WIREGUARD_VERSION}.tar.xz | \
+        pkgconf-pkg-config unzip zip /usr/bin/pkg-config xz -y
+        
+RUN curl -LS https://git.zx2c4.com/wireguard-linux-compat/snapshot/wireguard-linux-compat-${WIREGUARD_VERSION}.tar.xz | \
         { t="$(mktemp)"; trap "rm -f '$t'" INT TERM EXIT; cat >| "$t"; sha256sum --quiet -c <<<"${WIREGUARD_SHA256} $t" \
         || exit 1; cat "$t"; } | tar xJf -
 
@@ -30,11 +31,11 @@ RUN if [ -n "${KERNEL_CORE_RPM}" ]; then \
     fi; \
         dnf install kernel-core-${WIREGUARD_KERNEL_VERSION}.rpm \
         kernel-devel-${WIREGUARD_KERNEL_VERSION}.rpm \
-        kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm -y && \
-        dnf clean all
+        kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm \
+        wireguard-tools -y
 
-RUN cd /tmp/WireGuard-${WIREGUARD_VERSION}/src; \
-    KERNELDIR=/usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/build make -j$(nproc) && make install
+RUN cd /tmp/wireguard-linux-compat-${WIREGUARD_VERSION}/src; \
+    KERNELDIR=/usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/build make -j$(nproc) &&  KERNELRELEASE=${WIREGUARD_KERNEL_VERSION} make install
 
 # base
 FROM registry.access.redhat.com/ubi8:latest
@@ -42,17 +43,18 @@ FROM registry.access.redhat.com/ubi8:latest
 WORKDIR /tmp
 
 ARG WIREGUARD_KERNEL_VERSION
+ENV WIREGUARD_KERNEL_VERSION ${WIREGUARD_KERNEL_VERSION}
 
 RUN yum update -y
 RUN yum install kmod -y
 
-COPY --from=builder /usr/lib/modules/4.18.0-193.el8.x86_64/kernel/net/ipv4/udp_tunnel.ko.xz \
+COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv4/udp_tunnel.ko.xz \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv4/udp_tunnel.ko.xz
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/wireguard.ko
-RUN depmod -a
+RUN depmod -a ${WIREGUARD_KERNEL_VERSION}
 
 COPY --from=builder /usr/bin/wg /usr/bin/wg
 COPY --from=builder /usr/bin/wg-quick /usr/bin/wg-quick

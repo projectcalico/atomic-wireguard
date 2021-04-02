@@ -1,5 +1,6 @@
 FROM fedora as builder
-MAINTAINER "Joe Doss" <joe@solidadmin.com>
+LABEL MAINTAINER="Project Calico <info@projectcalico.org>"
+LABEL CREDITS="Joe Doss <joe@solidadmin.com" 
 
 ARG WIREGUARD_VERSION
 ARG WIREGUARD_KERNEL_VERSION
@@ -20,7 +21,7 @@ RUN dnf update -y && dnf install \
         kernel-devel-${WIREGUARD_KERNEL_VERSION}.rpm \
         kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm -y && \
         dnf clean all && \
-        curl -LS https://git.zx2c4.com/WireGuard/snapshot/WireGuard-${WIREGUARD_VERSION}.tar.xz | \
+        curl -LS https://git.zx2c4.com/wireguard-linux-compat/snapshot/wireguard-linux-compat-${WIREGUARD_VERSION}.tar.xz | \
         { t="$(mktemp)"; trap "rm -f '$t'" INT TERM EXIT; cat >| "$t"; sha256sum --quiet -c <<<"${WIREGUARD_SHA256} $t" \
         || exit 1; cat "$t"; } | tar xJf -
 
@@ -28,7 +29,8 @@ RUN cd /tmp/WireGuard-${WIREGUARD_VERSION}/src; \
     KERNELDIR=/usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/build make -j$(nproc) && make install
 
 FROM fedora
-MAINTAINER "Joe Doss" <joe@solidadmin.com>
+LABEL MAINTAINER="Project Calico <info@projectcalico.org>"
+LABEL CREDITS="Joe Doss <joe@solidadmin.com" 
 
 ARG WIREGUARD_KERNEL_VERSION
 
