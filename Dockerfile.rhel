@@ -15,8 +15,9 @@ RUN dnf update -y && dnf install \
         boost-date-time boost-system boost-thread cpp dyninst efivar-libs gc \
         gcc glibc-devel glibc-headers guile koji isl libatomic_ops libdwarf libmpc \
         libpkgconf libtool-ltdl libxcrypt-devel make mokutil pkgconf pkgconf-m4 \
-        pkgconf-pkg-config unzip zip /usr/bin/pkg-config xz -y && \
-        curl -LS https://git.zx2c4.com/WireGuard/snapshot/WireGuard-${WIREGUARD_VERSION}.tar.xz | \
+        pkgconf-pkg-config unzip zip /usr/bin/pkg-config xz -y
+        
+RUN curl -LS https://git.zx2c4.com/wireguard-linux-compat/snapshot/wireguard-linux-compat-${WIREGUARD_VERSION}.tar.xz | \
         { t="$(mktemp)"; trap "rm -f '$t'" INT TERM EXIT; cat >| "$t"; sha256sum --quiet -c <<<"${WIREGUARD_SHA256} $t" \
         || exit 1; cat "$t"; } | tar xJf -
 
