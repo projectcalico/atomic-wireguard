@@ -31,7 +31,8 @@ RUN if [ -n "${KERNEL_CORE_RPM}" ]; then \
     fi; \
         dnf install kernel-core-${WIREGUARD_KERNEL_VERSION}.rpm \
         kernel-devel-${WIREGUARD_KERNEL_VERSION}.rpm \
-        kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm -y
+        kernel-modules-${WIREGUARD_KERNEL_VERSION}.rpm \
+        wireguard-tools -y
 
 RUN cd /tmp/wireguard-linux-compat-${WIREGUARD_VERSION}/src; \
     KERNELDIR=/usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/build make -j$(nproc) &&  KERNELRELEASE=${WIREGUARD_KERNEL_VERSION} make install
@@ -42,6 +43,7 @@ FROM registry.access.redhat.com/ubi8:latest
 WORKDIR /tmp
 
 ARG WIREGUARD_KERNEL_VERSION
+ENV WIREGUARD_KERNEL_VERSION ${WIREGUARD_KERNEL_VERSION}
 
 RUN yum update -y
 RUN yum install kmod -y
@@ -52,7 +54,7 @@ COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/kernel/net/ipv6/ip6_udp_tunnel.ko.xz
 COPY --from=builder /usr/lib/modules/${WIREGUARD_KERNEL_VERSION}/extra/wireguard.ko \
                     /lib/modules/${WIREGUARD_KERNEL_VERSION}/wireguard.ko
-RUN depmod -a
+RUN depmod -a ${WIREGUARD_KERNEL_VERSION}
 
 COPY --from=builder /usr/bin/wg /usr/bin/wg
 COPY --from=builder /usr/bin/wg-quick /usr/bin/wg-quick
